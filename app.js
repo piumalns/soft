@@ -33,6 +33,10 @@ app.use((req, res, next)=> {
     }
     next();
 });
+app.get("/",(req,res)=>{
+res.send("hello world")
+})
+
 app.use('/jobs', jobRoutes);
 app.use('/reasons', reasonRoutes);
 app.use('/faults',faultRoutes);
