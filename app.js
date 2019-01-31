@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const port = process.env.PORT || 3000;
 
+
 const jobRoutes = require('./api/routes/jobs');
 const reasonRoutes = require('./api/routes/reasons');
 const faultRoutes = require('./api/routes/faults');
@@ -33,6 +34,10 @@ app.use((req, res, next)=> {
     }
     next();
 });
+app.get("/",(req,res)=>{
+res.send("hello world")
+})
+
 app.use('/jobs', jobRoutes);
 app.use('/reasons', reasonRoutes);
 app.use('/faults',faultRoutes);
@@ -45,14 +50,7 @@ app.use((req, res, next)=> {
      next(error);
 })
 
-app.use((error, req, res, next)=>{
-    res.status(error.status || 500);
-    res.json({
-        error:{
-            message:error.message
-        }
-    });
-});
+
 
 
 
