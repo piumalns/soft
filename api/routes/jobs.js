@@ -1,6 +1,17 @@
 const express = require('express');
 const router = express.Router();
 const mongoose =  require('mongoose');
+var multer  = require('multer')
+
+const storage = multer.diskStorage({
+    destination: function(req, file, cb) {
+        cb(null, './fault_image/')
+    },
+    filename: function(req, file, cb) {
+        cb(null, Date.now() +'_'+ file.originalname)
+    }
+})
+var upload = multer({storage: storage})
 
 
 const Job = require('../models/job');
@@ -55,8 +66,85 @@ router.get('/jobs', function(req, res) {
     });
   });
  
-router.post("/", (req, res, next)=> {
-    Reason.findById(req.body.reasonId)
+router.post("/",upload.single('faultImage'), (req, res, next)=> {
+    console.log(req.file)
+    if (req.file) {
+        const job = new Job ({
+            _id: mongoose.Types.ObjectId(),
+            jobNo:req.body.jobNo,
+            inventory: req.body.inventory,
+            description:req.body.description,
+            faultImag:req.file.path
+            //machine:req.body.machineId,
+            //reason: req.body.reasonId,
+            //fault: req.body.faultId,
+        });
+        return job
+        .save()
+        .then(result => {
+            console.log(result);
+            res.status(201).json({
+                message: 'Job Stored',
+                /*createdJob: {
+                    _id: result._id,
+                    jobNo: result.jobNo,
+                    machine:result.machine,
+                    reason: result.reason,
+                    fault: result.fault,
+                    inventory: result.inventory,
+                    description:result.description
+                },*/
+                request: {
+                    type: 'GET',
+                    url:'http://localhost:3000/jobs/' + result._id
+                }
+            });
+        })
+        .catch(err => {
+            console.log(err);
+            res.status(500).json({
+                error: err
+            });
+        });
+    } else {
+        const job = new Job ({
+            _id: mongoose.Types.ObjectId(),
+            jobNo:req.body.jobNo,
+            inventory: req.body.inventory,
+            description:req.body.description,
+            //machine:req.body.machineId,
+            //reason: req.body.reasonId,
+            //fault: req.body.faultId,
+        });
+        return job
+        .save()
+        .then(result => {
+            console.log(result);
+            res.status(201).json({
+                message: 'Job Stored',
+                /*createdJob: {
+                    _id: result._id,
+                    jobNo: result.jobNo,
+                    machine:result.machine,
+                    reason: result.reason,
+                    fault: result.fault,
+                    inventory: result.inventory,
+                    description:result.description
+                },*/
+                request: {
+                    type: 'GET',
+                    url:'http://localhost:3000/jobs/' + result._id
+                }
+            });
+        })
+        .catch(err => {
+            console.log(err);
+            res.status(500).json({
+                error: err
+            });
+        });
+    }
+    /*Reason.findById(req.body.reasonId)
     .then(reason => {
         if(!reason) {
             return res.status(404).json({
@@ -79,44 +167,8 @@ router.post("/", (req, res, next)=> {
                 message:"Machine not found"
             });
         }
-    })
-    const job = new Job ({
-        _id: mongoose.Types.ObjectId(),
-        jobNo:req.body.jobNo,
-        inventory: req.body.inventory,
-        description:req.body.description,
-        machine:req.body.machineId,
-        reason: req.body.reasonId,
-        fault: req.body.faultId,
-    });
-    return job
-    .save()
-    
-    .then(result => {
-        console.log(result);
-        res.status(201).json({
-            message: 'Job Stored',
-            createdJob: {
-                _id: result._id,
-                jobNo: result.jobNo,
-                machine:result.machine,
-                reason: result.reason,
-                fault: result.fault,
-                inventory: result.inventory,
-                description:result.description
-            },
-            request: {
-                type: 'GET',
-                url:'http://localhost:3000/jobs/' + result._id
-            }
-        });
-    })
-    .catch(err => {
-        console.log(err);
-        res.status(500).json({
-            error: err
-        });
-    });
+    })*/
+
 });
 
 router.get('/:jobId', (req, res, next)=>{

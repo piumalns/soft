@@ -17,6 +17,7 @@ mongoose.connect('mongodb://usersandu:usersandu123@ds211774.mlab.com:11774/jobca
 mongoose.Promise = global.Promise;
 
 app.use(morgan('dev'));
+app.use('/fault_image',express.static('fault_image'))
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 
@@ -52,6 +53,7 @@ app.use((error, req, res, next)=>{
         }
     });
 });
+
 
 
 module.exports = app;
